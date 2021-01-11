@@ -20,6 +20,10 @@ const productSchema = mongoose.Schema({
     url:{
         type:String,
         required:true
+    },
+    isAdded:{
+        type:Boolean,
+        default:false,
     }
 })
 

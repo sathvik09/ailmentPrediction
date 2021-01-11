@@ -10,7 +10,7 @@ class Navigation extends StatelessWidget{
       stream: bloc.navColorMode,
       builder: (context,snapshot){
         return CurvedNavigationBar(
-    backgroundColor: bloc.currentColor()?Colors.black:Colors.amber,
+    backgroundColor: bloc.currentColor()?Colors.black:Colors.white,
     color: bloc.currentColor()?Color.fromRGBO(211, 255, 21,1):Colors.lightBlue[200],
     animationDuration:Duration(milliseconds: 620),
     items: <Widget>[

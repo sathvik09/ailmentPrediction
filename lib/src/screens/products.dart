@@ -17,7 +17,9 @@ class Products extends StatefulWidget{
 class ProductState extends State<Products>{
   List<DataModel> elements = [];
   Future<dynamic> part =  get('http://10.0.2.2:3000/data/getData');
-
+  List<bool> checkBool = [];
+  String st = '';
+  int x = 0;
 
      Widget build(BuildContext context){
       // fetchData();
@@ -52,7 +54,7 @@ class ProductState extends State<Products>{
             return  StreamBuilder( 
       stream: bloc.colorMode,
       builder: (context,snap){
-        bloc.backgroundColor =  bloc.currentColor()?Colors.black:Colors.amber;
+        bloc.backgroundColor =  bloc.currentColor()?Colors.black:Colors.white;
         bloc.textColor =  bloc.currentColor()?Colors.white:Colors.black;
         return  streamComponent(children);
       }
@@ -86,7 +88,7 @@ class ProductState extends State<Products>{
   Widget flipSwitch(){
     return StreamBuilder(
       stream: bloc.colorMode,
-      builder: (context, snapshot) {
+      builder: (context, snapshot){
         return Row(
               children: <Widget>[
                 Text('Flip the colors!?',
@@ -107,32 +109,78 @@ class ProductState extends State<Products>{
     for(int i=0;i<jsonArr.length;i++){
      elements.add(DataModel(jsonArr[i])); 
     }
-    return ListView.builder(
-      // scrollDirection: Axis.vertical,
-      // shrinkWrap: true,
+    if(checkBool.length==0){
+      checkBool.length = elements.length;
+    checkBool.fillRange(0,elements.length,false);
+    }
+    return StreamBuilder(
+      stream: bloc.colorMode,
+      builder: (context,snap){
+        return ListView.builder(
       itemCount:elements.length,
-      itemBuilder: (context,int index) {
-        print(elements[index]);
-       return buildComponent(elements[index]);
+      itemBuilder: (context,int position) {
+         print(position);
+       return buildComponent(elements[position],position);
+      },
+    );
       },
     );
   }
 
-  Widget buildComponent(DataModel instanceOfData){
-    print(instanceOfData.id);
+  Widget buildComponent(DataModel instanceOfData,int position){
+   if(position>=5){
+     return Container();
+   }
     return Container(
-     decoration: BoxDecoration(border: Border.all(color:Colors.grey)),
-     padding: EdgeInsets.all(20.0),
+   //   color:  ,
+     decoration: BoxDecoration(border: Border.all(color:bloc.backgroundColor)),
+     padding: EdgeInsets.all(10.0),
      margin: EdgeInsets.all(20.0),
       child: Column(
-        children: <Widget>[
+        children: productList(instanceOfData,position),
+                ),
+               );
+             }
+            
+           
+             void addToCart(DataModel instance,int position) async{
+             // print(checkBool[position]);
+               bloc.updatedata(instance);
+              setState(() {
+                checkBool[position] = true;
+              });
+                    await post('http://10.0.2.2:3000/data/addCart',headers: {'Content-type' : 'application/json'},body: jsonEncode({'id':instance.id}));
+                   // .then((value) => print(json.decode(value)))
+                   // .catchError((onError)=>print(onError));
+              // });
+             }
+
+
+
+
+  List<Widget> productList(instanceOfData,position){
+    return [
         //  Image(image: AssetImage(instanceOfData.url)),
+         
+
+             Padding(
+                 padding: EdgeInsets.only(top: 5.0,bottom: 8.0),
+                 child: Text(instanceOfData.name,style: TextStyle(color: bloc.currentColor()?Colors.white:Colors.blue,fontSize: 30.0),),
+               ),
+        Text('Description',style: TextStyle(color: bloc.currentColor()?Colors.white:Colors.blue),),
          Padding(
              padding: EdgeInsets.only(top: 5.0),
-             child: Text(instanceOfData.desc),
+             child: Text(instanceOfData.desc,style: TextStyle(color: bloc.currentColor()?Colors.white:Colors.blue),),
            ),
-       ],
-     ),
-    );
-  }
+           Text('Image',style: TextStyle(color: bloc.currentColor()?Colors.white:Colors.blue),),
+         Padding(
+             padding: EdgeInsets.only(top: 5.0),
+             child: Image(image: AssetImage(instanceOfData.url),)
+           ),
+                      RaisedButton(onPressed:(checkBool[position] || instanceOfData.isAdded)?null:()=>addToCart(instanceOfData,position),
+                      child:(checkBool[position] || instanceOfData.isAdded)?Text('Added to cart'):Text('Add to cart'),           
+                      color: bloc.currentColor()?Color.fromRGBO(211, 255, 21,1):Colors.lightBlue[200])
+           
+                  ];
+  }         
 }
