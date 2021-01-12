@@ -22,6 +22,22 @@ exports.addCart = async(req,res,next)=>{
 
  }
 
+exports.resetAll = async (req,res,next)=>{
+    await Products.find().exec()
+    .then(val=>{
+        val.forEach(e=>{
+            e.isAdded = false;
+            e.save();
+        })
+    })
+    .catch(err=>{
+        console.log(err);
+    })
+    res.send('<h1>All items set to false</h1>');
+} 
+
+
+// initially to add data
 exports.addData = async (req,res,next)=>{
     console.log('hereee');
     res.send('fsda');

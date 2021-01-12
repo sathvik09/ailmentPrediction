@@ -75,7 +75,7 @@ class AdminLoginState extends State<AdminLogin>{
             )],
               ),
             image!=null?Image.file(image):Icon(Icons.photo,size: 80,color: Colors.blue,), 
-            Text(text),
+            Text(text,style: TextStyle(color:bloc.currentColor()?Colors.lightBlue:Colors.black),),
             // child: Text('A new Page'),
               ],
             ),
